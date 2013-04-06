@@ -15,7 +15,7 @@ static bool     kb_in_text_mode = false;
 static input_t  kb_callbacks[ ALLEGRO_KEY_MAX ];
 
 /******************************************************************************
- * INPUTS -- NITIFICATIONS
+ * INPUTS -- NOTIFICATIONS
  * Designed to run the moment a key is pressed/released
 ******************************************************************************/
 void keyboard_notify(unsigned keycode, bool state) {

@@ -17,51 +17,35 @@ static bool system_is_running = true;
 static ALLEGRO_DISPLAY* system_display = NULL;
 
 /******************************************************************************
- *  Display Initialization
-******************************************************************************/
-bool system_init_display(void) {
-    int width, height;
-    al_set_new_display_option(ALLEGRO_VSYNC, 2, ALLEGRO_REQUIRE); /* disables vsync */
-    al_set_new_display_flags( ALLEGRO_OPENGL );
-
-    settings_getDisplaySize(&width, &height);
-    system_display = al_create_display(width, height);
-
-    if (!system_display)
-        return false;
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    al_flip_display();
-    return true;
-}
-
-/******************************************************************************
- *  Event Initialization
-******************************************************************************/
-bool system_init_events(void) {
-
-    return true;
-}
-
-/******************************************************************************
  * SYSTEM -- GAME INITIALIZATION
 ******************************************************************************/
 bool init_system(void) {
     /* Initialize the main display */
-    if (!system_init_display()) {
+    int width, height;
+    al_set_new_display_option(ALLEGRO_VSYNC, 2, ALLEGRO_REQUIRE); /* disables vsync */
+    al_set_new_display_flags( ALLEGRO_OPENGL );
+
+    settings_get_display_size(&width, &height);
+    system_display = al_create_display(width, height);
+
+    if (!system_display) {
         printf("An error occurred while initializing the display.\n");
         return false;
     }
 
     /* Initialize the system timer */
-    system_timer = al_create_timer(1.0 / settings_getTargetFps());
+    system_timer = al_create_timer(1.0 / settings_get_target_fps());
     if (!system_timer) {
         printf("An error occurred while initializing the game timer.\n");
+        terminate_system();
         return false;
     }
     
     system_event_queue = al_create_event_queue();
-    if (!system_event_queue)
+    if (!system_event_queue) {
+        terminate_system();
         return false;
+    }
 
     /* Register events from the display */
     al_register_event_source(
@@ -85,7 +69,7 @@ bool init_system(void) {
 /******************************************************************************
  * SYSTEM -- GAME TERMINATION
 ******************************************************************************/
-void system_shutdown(void) {
+void terminate_system(void) {
     (void) settings_save();
     al_destroy_event_queue(system_event_queue);
     al_destroy_display(system_display);
@@ -95,14 +79,14 @@ void system_shutdown(void) {
 /******************************************************************************
  * SYSTEM -- SIGNAL PROGRAM TERMINATION
 ******************************************************************************/
-void system_signal_game_quit(void) {
+void sys_signal_game_quit(void) {
     system_is_running = false;
 }
 
 /******************************************************************************
  * SYSTEM -- GAME LOOP
 ******************************************************************************/
-void system_do_main_loop(void) {
+void sys_do_main_loop(void) {
     /* Game Tick Counting */
     double prev_time_count = 0.0;
     double curr_time_count = 0.0;

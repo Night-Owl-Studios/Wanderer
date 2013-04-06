@@ -71,7 +71,7 @@ bool init_objects() {
         return false;
     }
     
-    keyboard_set_callback(ALLEGRO_KEY_ESCAPE, true, &system_signal_game_quit);
+    keyboard_set_callback(ALLEGRO_KEY_ESCAPE, true, &sys_signal_game_quit);
     keyboard_set_callback(ALLEGRO_KEY_D, true, &drawRight);
     keyboard_set_callback(ALLEGRO_KEY_A, true, &drawLeft);
 

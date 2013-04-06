@@ -80,11 +80,11 @@ int main(void) {
     if (!init())
         return -1;
 
-    system_do_main_loop();
+    sys_do_main_loop();
 
     /* cleanup */
     terminate_objects();
-    system_shutdown();
+    terminate_system();
 
     return 0;
 }

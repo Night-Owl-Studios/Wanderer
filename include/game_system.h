@@ -6,12 +6,12 @@
 
 #include "game_main.h"
 
-
 bool init_system(void);
-void system_shutdown(void);
 
-void system_do_main_loop(void);
+void terminate_system(void);
 
-void system_signal_game_quit(void);
+void sys_do_main_loop(void);
+
+void sys_signal_game_quit(void);
 
 #endif /* __GAME_SYSTEM_H__ */

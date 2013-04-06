@@ -9,44 +9,42 @@ const int DEFAULT_SETTING_DISPLAY_HEIGHT = 480;
 const int DEFAULT_SETTING_TARGET_FPS = 60;
 const char* DEFAULT_SETTING_RESOURCE_DIR = "resources/";
 const char* DEFAULT_SETTING_FILE = "settings.ini";
+const char* GAME_SETTINGS_SECTION = "[GAME SETTINGS]";
 
 static struct {
-    int displayWidth;
-    int displayHeight;
-    int targetFps;
+    int display_width;
+    int display_height;
+    int target_fps;
 } game_settings;
 
 /******************************************************************************
  * Convenience Utility Functions
 ******************************************************************************/
-void loadIntFromConfig(
-    int* value, ALLEGRO_CONFIG* cfg, const char* key, int defaultValue
-);
-void saveIntToConfig(const int* value, ALLEGRO_CONFIG* cfg, const char* key);
+int load_int_from_cfg( ALLEGRO_CONFIG*, const char* key, int defaultValue );
+void save_int_to_cfg(const int* value, ALLEGRO_CONFIG* cfg, const char* key);
 
 /******************************************************************************
  * Utility -- loading integral values from an allegro config
 ******************************************************************************/
-void loadIntFromConfig(
-    int* value, ALLEGRO_CONFIG* cfg, const char* key, int defaultValue
+int load_int_from_cfg(
+    ALLEGRO_CONFIG* cfg,
+    const char* key,
+    int defaultValue
 ) {
-    const char* buffer = al_get_config_value(cfg, "GAME_SETTINGS", key);
+    const char* buffer = al_get_config_value(cfg, GAME_SETTINGS_SECTION, key);
     if (buffer)
-        *value = atoi(buffer);
+        return atoi(buffer);
     else
-        *value = defaultValue;
-
-    if (!(*value))
-        *value = defaultValue;
+        return defaultValue;
 }
 
 /******************************************************************************
  * Utility -- Saving integral values from an allegro config
 ******************************************************************************/
-void saveIntToConfig(const int* value, ALLEGRO_CONFIG* cfg, const char* key) {
+void save_int_to_cfg(const int* value, ALLEGRO_CONFIG* cfg, const char* key) {
     char buffer[ 15 ] = {0};
     sprintf(buffer, "%i", *value);
-    al_set_config_value(cfg, "GAME_SETTINGS", key, buffer);
+    al_set_config_value(cfg, GAME_SETTINGS_SECTION, key, buffer);
 }
 
 /******************************************************************************
@@ -74,29 +72,26 @@ bool init_settings(void) {
 
     /* Read in the game settings, one by one */
     /* Display Width */
-    loadIntFromConfig(
-        &game_settings.displayWidth, cfgData,
-        "displayWidth", DEFAULT_SETTING_DISPLAY_WIDTH
+    game_settings.display_width = load_int_from_cfg(
+        cfgData, "displayWidth", DEFAULT_SETTING_DISPLAY_WIDTH
     );
 
     /* Display Height */
-    loadIntFromConfig(
-        &game_settings.displayHeight, cfgData,
-        "displayHeight", DEFAULT_SETTING_DISPLAY_HEIGHT
+    game_settings.display_height = load_int_from_cfg(
+        cfgData, "displayHeight", DEFAULT_SETTING_DISPLAY_HEIGHT
     );
 
     /* Target FPS */
-    loadIntFromConfig(
-        &game_settings.targetFps, cfgData,
-        "targetFps", DEFAULT_SETTING_TARGET_FPS
+    game_settings.target_fps = load_int_from_cfg(
+        cfgData, "targetFps", DEFAULT_SETTING_TARGET_FPS
     );
 
     al_fclose(cfgFile);
     al_destroy_config(cfgData);
     
-    game_settings.displayWidth = DEFAULT_SETTING_DISPLAY_WIDTH;
-    game_settings.displayHeight = DEFAULT_SETTING_DISPLAY_HEIGHT;
-    game_settings.targetFps = DEFAULT_SETTING_TARGET_FPS;
+    game_settings.display_width = DEFAULT_SETTING_DISPLAY_WIDTH;
+    game_settings.display_height = DEFAULT_SETTING_DISPLAY_HEIGHT;
+    game_settings.target_fps = DEFAULT_SETTING_TARGET_FPS;
     
     return true;
 }
@@ -117,12 +112,12 @@ int settings_save(void) {
         );
         return false;
     }
-    al_add_config_section(cfgData, "GAME_SETTINGS");
-    al_add_config_comment(cfgData, "GAME_SETTINGS", "Global Game Settings");
+    al_add_config_comment(cfgData, NULL, "Global Game Settings");
+    al_add_config_section(cfgData, GAME_SETTINGS_SECTION);
 
-    saveIntToConfig(&game_settings.displayWidth, cfgData, "displayWidth");
-    saveIntToConfig(&game_settings.displayHeight, cfgData, "displayHeight");
-    saveIntToConfig(&game_settings.targetFps, cfgData, "targetFps");
+    save_int_to_cfg(&game_settings.display_width, cfgData, "displayWidth");
+    save_int_to_cfg(&game_settings.display_height, cfgData, "displayHeight");
+    save_int_to_cfg(&game_settings.target_fps, cfgData, "targetFps");
 
     cfgFile = al_fopen(DEFAULT_SETTING_FILE, "w");
     if (cfgFile == NULL) {
@@ -150,43 +145,36 @@ int settings_save(void) {
 /******************************************************************************
  * GAME_SETTINGS -- GET DISPLAY SIZE
 ******************************************************************************/
-void settings_getDisplaySize(int* width, int* height) {
-    *width = game_settings.displayWidth;
-    *height = game_settings.displayHeight;
+void settings_get_display_size(int* width, int* height) {
+    *width = game_settings.display_width;
+    *height = game_settings.display_height;
 }
 
 /******************************************************************************
  * GAME_SETTINGS -- SET DISPLAY SIZE
 ******************************************************************************/
-void settings_setDisplaySize(int width, int height) {
-    game_settings.displayWidth = width;
-    game_settings.displayHeight = height;
+void settings_set_display_size(int width, int height) {
+    game_settings.display_width = width;
+    game_settings.display_height = height;
 }
 
 /******************************************************************************
  * GAME_SETTINGS -- GET TARGET FPS
 ******************************************************************************/
-int settings_getTargetFps(void) {
-    return game_settings.targetFps;
+int settings_get_target_fps(void) {
+    return game_settings.target_fps;
 }
 
 /******************************************************************************
  * GAME_SETTINGS -- SET TARGET FPS
 ******************************************************************************/
-void settings_setTargetFps(int fps) {
-    game_settings.targetFps = fps;
+void settings_set_target_fps(int fps) {
+    game_settings.target_fps = fps;
 }
 
 /******************************************************************************
  * GAME_SETTINGS -- GET GAME RESOURCE DIRECTORY
 ******************************************************************************/
-const char* settings_getResourceDir(void) {
+const char* settings_get_resource_dir(void) {
     return DEFAULT_SETTING_RESOURCE_DIR;
-}
-
-/******************************************************************************
- * GAME_SETTINGS -- GET SETTINGS FILE NAME
-******************************************************************************/
-const char* settings_getSettingsFileName(void) {
-    return DEFAULT_SETTING_FILE;
 }
